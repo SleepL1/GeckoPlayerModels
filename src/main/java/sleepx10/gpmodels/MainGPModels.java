@@ -7,7 +7,10 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
+import sleepx10.gpmodels.common.capabilities.network.ModelsCapMeesage;
 import sleepx10.gpmodels.proxies.CommonProxy;
 import sleepx10.gpmodels.utils.Reference;
 
@@ -24,14 +27,17 @@ public class MainGPModels {
 	public static SimpleNetworkWrapper NETWORK;
 	
 	// Different ways of render the player.
-	public static boolean itemWay = false;
+	public static boolean itemWay = true;
 	public static boolean blockWay = false;
 	public static boolean eventWay = false;
-	public static boolean headRotation = false;
+	public static boolean headRotation = true;
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
 		proxy.preInit(e);
+		
+		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.MOD_ID);
+		NETWORK.registerMessage(ModelsCapMeesage.Handler.class, ModelsCapMeesage.class, 0, Side.CLIENT);
 	}
 	
 	@EventHandler

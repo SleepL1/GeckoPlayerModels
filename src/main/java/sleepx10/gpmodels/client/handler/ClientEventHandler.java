@@ -47,7 +47,7 @@ public class ClientEventHandler {
 	}
 
 	@SubscribeEvent
-	public static void onPlayerRender(RenderPlayerEvent e) {
+	public static void onPlayerRender(RenderPlayerEvent.Pre e) {
 		IModelsCap modelsCap = e.getEntityPlayer().getCapability(ModCapabilities.CAPABILITY_MODELS, null);
 
 		if (modelsCap != null) {
@@ -84,7 +84,7 @@ public class ClientEventHandler {
 					geckoPlayerRenderer.renderPlayer(
 							geckoPlayerRenderer.getGeoModelProvider()
 									.getModel(geckoPlayerRenderer.getGeoModelProvider().getModelLocation(geckoPlayer)),
-							geckoPlayer, e.getPartialRenderTick(), 0, 0, 0, 0, e);
+							geckoPlayer, e.getPartialRenderTick(), 0, 0, 0, 0, e, modelsCap);
 			}
 		}
 	}

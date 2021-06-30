@@ -17,6 +17,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import sleepx10.gpmodels.MainGPModels;
+import sleepx10.gpmodels.common.capabilities.IModelsCap;
 import sleepx10.gpmodels.common.entities.GeckoPlayer;
 import sleepx10.gpmodels.utils.GeckoPlayerUtils;
 import sleepx10.gpmodels.utils.MatrixUtils;
@@ -72,7 +74,7 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 	public HashMap<Class<? extends GeckoPlayer>, GeckoPlayerRenderer> getModelsToLoad() {
 		return modelsToLoad;
 	}
-	
+
 	public void setColor(float r, float g, float b, float a) {
 		this.r = r;
 		this.g = g;
@@ -92,7 +94,7 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 	}
 
 	public void renderPlayer(GeoModel model, T animatable, float partialTicks, float red, float green, float blue,
-			float alpha, RenderPlayerEvent e) {
+			float alpha, RenderPlayerEvent e, IModelsCap modelCap) {
 
 		if (animatable.getPlayer().isInvisibleToPlayer(Minecraft.getMinecraft().player))
 			return;
@@ -101,7 +103,7 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 		GlStateManager.disableCull();
 
 		boolean captured = MatrixUtils.captureMatrix();
-		
+
 		// If you don't want the model to rotate the head with the movement of the mouse
 		// simply remove this line.
 		GeckoPlayerUtils.checkHeadRotations(e);
@@ -121,14 +123,14 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 		GlStateManager.enableAlpha();
 
 		renderPlayerEarly(animatable, partialTicks, red, green, blue, alpha, e);
-		
+
 		Minecraft.getMinecraft().getTextureManager().bindTexture(getGeoModelProvider().getTextureLocation(animatable));
 		getGeoModelProvider().setLivingAnimations(animatable, animatable.getPlayer().getUniqueID().hashCode());
 		setColor(1F, 1F, 1F, 1F);
 
 		GlStateManager.disableCull();
 		GlStateManager.enableRescaleNormal();
-		
+
 		renderPlayerLate(animatable, partialTicks, red, green, blue, alpha, e);
 
 		BufferBuilder builder = Tessellator.getInstance().getBuffer();
@@ -136,13 +138,13 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 
 		// Render all top level bones.
 		for (GeoBone bone : model.topLevelBones) {
-			renderRecursively(builder, MATRIX_STACK, bone, e);
+			renderRecursively(builder, MATRIX_STACK, bone, e, modelCap);
 		}
 
 		Tessellator.getInstance().draw();
-		
+
 		renderPlayerAfter(animatable, partialTicks, red, green, blue, alpha, e);
-		
+
 		GlStateManager.disableBlend();
 		GlStateManager.disableRescaleNormal();
 		GlStateManager.enableCull();
@@ -156,13 +158,27 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 		e.getRenderer().renderName((AbstractClientPlayer) e.getEntityPlayer(), e.getX(), e.getY(), e.getZ());
 	}
 
-	public void renderRecursively(BufferBuilder builder, MatrixStack stack, GeoBone bone, RenderPlayerEvent e) {
+	public void renderRecursively(BufferBuilder builder, MatrixStack stack, GeoBone bone, RenderPlayerEvent e,
+			IModelsCap modelCap) {
 
-		if (bone.getName().equals("handle_helmet")) {
+		if (MainGPModels.headRotation) {
 			stack.push();
-			bone.setRotationX(-e.getRenderer().getMainModel().bipedHead.rotateAngleX);
-			bone.setRotationY(-e.getRenderer().getMainModel().bipedHead.rotateAngleY);
-			bone.setRotationZ(-e.getRenderer().getMainModel().bipedHead.rotateAngleZ);
+			switch (modelCap.getModelId()) {
+			case "impModel":
+				if (bone.getName().equals("head")) {
+					bone.setRotationX(-e.getRenderer().getMainModel().bipedHead.rotateAngleX);
+					bone.setRotationY(-e.getRenderer().getMainModel().bipedHead.rotateAngleY);
+					bone.setRotationZ(-e.getRenderer().getMainModel().bipedHead.rotateAngleZ);
+				}
+				break;
+			case "humanModel":
+				if (bone.getName().equals("handle_helmet")) {
+					bone.setRotationX(-e.getRenderer().getMainModel().bipedHead.rotateAngleX);
+					bone.setRotationY(-e.getRenderer().getMainModel().bipedHead.rotateAngleY);
+					bone.setRotationZ(-e.getRenderer().getMainModel().bipedHead.rotateAngleZ);
+				}
+				break;
+			}
 			stack.pop();
 		}
 
@@ -184,7 +200,7 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 			}
 
 			for (GeoBone childBone : bone.childBones) {
-				renderRecursively(builder, stack, childBone, e);
+				renderRecursively(builder, stack, childBone, e, modelCap);
 			}
 		}
 
@@ -192,16 +208,19 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 	}
 
 	public void renderPlayerEarly(T animatable, float partialTicks, float red, float green, float blue, float alpha,
-			RenderPlayerEvent e) {}
+			RenderPlayerEvent e) {
+	}
 
 	public void renderPlayerLate(T animatable, float partialTicks, float red, float green, float blue, float alpha,
-			RenderPlayerEvent e) {}
+			RenderPlayerEvent e) {
+	}
 
 	public void renderPlayerAfter(T animatable, float partialTicks, float red, float green, float blue, float alpha,
-			RenderPlayerEvent e) {}
+			RenderPlayerEvent e) {
+	}
 
 	private void renderCube(BufferBuilder builder, MatrixStack stack, GeoCube cube) {
-				
+
 		stack.push();
 		stack.moveToPivot(cube);
 		stack.rotate(cube);

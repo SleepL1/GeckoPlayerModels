@@ -1,0 +1,28 @@
+{
+	"textures": {
+		"voxels_atlas": "gpm:items/test_item"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 7],
+			"to": [8, 16, 8],
+			"color": 4,
+			"faces": {
+				"north": {"uv": [0, 0, 1, 16], "texture": "#voxels_atlas"},
+				"east": {"uv": [0, 0, 1, 16], "texture": "#voxels_atlas"},
+				"south": {"uv": [0, 0, 1, 16], "texture": "#voxels_atlas"},
+				"west": {"uv": [0, 0, 1, 16], "texture": "#voxels_atlas"},
+				"up": {"uv": [0, 0, 1, 1], "texture": "#voxels_atlas"},
+				"down": {"uv": [0, 0, 1, 1], "texture": "#voxels_atlas"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0.25, 0, 1.5]
+		},
+		"ground": {
+			"rotation": [70, 0, 0]
+		}
+	}
+}

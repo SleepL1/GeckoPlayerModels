@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import sleepx10.gpmodels.client.handler.ClientEventHandler;
 import sleepx10.gpmodels.common.entities.GeckoPlayer;
+import sleepx10.gpmodels.utils.Reference;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 
 public class ModelGeckoPlayer extends AnimatedGeoModel<GeckoPlayer> {
@@ -27,27 +28,18 @@ public class ModelGeckoPlayer extends AnimatedGeoModel<GeckoPlayer> {
 		return textureLocation;
 	}
 	
-	public void setAnimationFileLocation(ResourceLocation animationFileLocation) {
-		this.animationFileLocation = animationFileLocation;
-	}
-	
-	public void setModelLocation(ResourceLocation modelLocation) {
-		this.modelLocation = modelLocation;
-	}
-	
-	public void setTextureLocation(ResourceLocation textureLocation) {
-		this.textureLocation = textureLocation;
-	}
-	
 	/** Check if the modelId has some ResourceLocation **/
 	public boolean resourceForModelId(String modelId, EntityPlayer player) {
 		switch(modelId) {
-		case "test":
-			setAnimationFileLocation(new ResourceLocation(""));
-			setAnimationFileLocation(new ResourceLocation(""));
-			setAnimationFileLocation(new ResourceLocation(""));
+		case "impModel":
+			this.animationFileLocation = new ResourceLocation(Reference.MOD_ID, "animations/player.imp.animation.json");
+			this.modelLocation = new ResourceLocation(Reference.MOD_ID, "geo/models/player.impmodel.geo.json");
+			this.textureLocation = new ResourceLocation(Reference.MOD_ID, "textures/entities/player/player.imp.texture.png");
 			return true;
-		case "test2":
+		case "humanModel":
+			this.animationFileLocation = new ResourceLocation(Reference.MOD_ID, "animations/player.human.animation.json");
+			this.modelLocation = new ResourceLocation(Reference.MOD_ID, "geo/models/player.humanmodel.geo.json");
+			this.textureLocation = new ResourceLocation(Reference.MOD_ID, "textures/entities/player/player.human.texture.png");
 			return true;
 		default:
 			System.out.println("Could not find any ResourceLocation for the modelId: "+modelId);
