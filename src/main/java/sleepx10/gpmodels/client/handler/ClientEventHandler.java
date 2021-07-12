@@ -39,10 +39,8 @@ public class ClientEventHandler {
 			}
 		}
 
-		if (MainGPModels.blockWay) {
-			for (Block block : BlockInit.BLOCKS) {
-				MainGPModels.proxy.registerItemRenderer(Item.getItemFromBlock(block), 0, "inventory");
-			}
+		for (Block block : BlockInit.BLOCKS) {
+			MainGPModels.proxy.registerItemRenderer(Item.getItemFromBlock(block), 0, "inventory");
 		}
 	}
 

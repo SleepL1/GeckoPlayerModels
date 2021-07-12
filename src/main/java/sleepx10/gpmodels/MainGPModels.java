@@ -27,10 +27,18 @@ public class MainGPModels {
 	public static SimpleNetworkWrapper NETWORK;
 	
 	// Different ways of render the player.
+	
+	/** ITEM WAY **/
+	//If you want the player to have a model by right clicking an item change this to true
 	public static boolean itemWay = true;
-	public static boolean blockWay = false;
-	public static boolean eventWay = false;
+	
+	/** HEAD ROTATION **/
+	//If you want the player to be able to rotate the head by moving the mouse change this to true
 	public static boolean headRotation = true;
+	
+	/** RENDER ITEM HAND **/
+	//If you want the player to render the item in hand change this to true
+	public static boolean renderItemInHand = true;
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {

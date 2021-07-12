@@ -1,12 +1,17 @@
 package sleepx10.gpmodels.utils;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import java.nio.FloatBuffer;
+
+import javax.vecmath.Matrix4f;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
-import javax.vecmath.*;
-import java.nio.FloatBuffer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import software.bernie.geckolib3.geo.render.built.GeoBone;
+import software.bernie.geckolib3.util.MatrixStack;
 
 /**
  * CODE BY: McHorse Checkout his github profile! Link:
@@ -25,10 +30,11 @@ public class MatrixUtils {
 	 */
 	public static final float[] floats = new float[16];
 
+
 	/**
 	 * Model view matrix captured here
 	 */
-	public static Matrix4f matrix;
+	public static Matrix4f matrix;	
 
 	/**
 	 * Read OpenGL's model view matrix
@@ -77,6 +83,20 @@ public class MatrixUtils {
 		floats[14] = matrix4f.m32;
 		floats[15] = matrix4f.m33;
 	}
+	
+	   public static void multiplyMatrix(MatrixStack stack, GeoBone bone)
+	    {
+	        matrix.set(stack.getModelMatrix());
+	        matrix.transpose();
+	 
+	        MatrixUtils.matrixToFloat(MatrixUtils.floats, matrix);
+	        MatrixUtils.buffer.clear();
+	        MatrixUtils.buffer.put(MatrixUtils.floats);
+	        MatrixUtils.buffer.flip();
+	 
+	        GlStateManager.multMatrix(MatrixUtils.buffer);
+	        GlStateManager.translate(bone.rotationPointX / 16, bone.rotationPointY / 16, bone.rotationPointZ / 16);
+	    }
 
 	public static boolean captureMatrix() {
 		if (matrix == null) {

@@ -12,7 +12,10 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -124,7 +127,6 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 
 		renderPlayerEarly(animatable, partialTicks, red, green, blue, alpha, e);
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(getGeoModelProvider().getTextureLocation(animatable));
 		getGeoModelProvider().setLivingAnimations(animatable, animatable.getPlayer().getUniqueID().hashCode());
 		setColor(1F, 1F, 1F, 1F);
 
@@ -134,14 +136,11 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 		renderPlayerLate(animatable, partialTicks, red, green, blue, alpha, e);
 
 		BufferBuilder builder = Tessellator.getInstance().getBuffer();
-		builder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
 
 		// Render all top level bones.
 		for (GeoBone bone : model.topLevelBones) {
-			renderRecursively(builder, MATRIX_STACK, bone, e, modelCap);
+			renderRecursively(animatable, builder, MATRIX_STACK, bone, e, modelCap);
 		}
-
-		Tessellator.getInstance().draw();
 
 		renderPlayerAfter(animatable, partialTicks, red, green, blue, alpha, e);
 
@@ -158,29 +157,39 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 		e.getRenderer().renderName((AbstractClientPlayer) e.getEntityPlayer(), e.getX(), e.getY(), e.getZ());
 	}
 
-	public void renderRecursively(BufferBuilder builder, MatrixStack stack, GeoBone bone, RenderPlayerEvent e,
-			IModelsCap modelCap) {
+	public void renderRecursively(T animatable, BufferBuilder builder, MatrixStack stack, GeoBone bone,
+			RenderPlayerEvent e, IModelsCap modelCap) {
 
-		if (MainGPModels.headRotation) {
-			stack.push();
-			switch (modelCap.getModelId()) {
-			case "impModel":
+		stack.push();
+		switch (modelCap.getModelId()) {
+		case "impModel":
+			if (MainGPModels.headRotation) {
 				if (bone.getName().equals("head")) {
 					bone.setRotationX(-e.getRenderer().getMainModel().bipedHead.rotateAngleX);
 					bone.setRotationY(-e.getRenderer().getMainModel().bipedHead.rotateAngleY);
 					bone.setRotationZ(-e.getRenderer().getMainModel().bipedHead.rotateAngleZ);
 				}
-				break;
-			case "humanModel":
+			}
+
+			if (MainGPModels.renderItemInHand) {
+				renderItemInHand(animatable, builder, bone, e, "rArm2", "lArm2");
+			}
+			break;
+		case "humanModel":
+			if (MainGPModels.headRotation) {
 				if (bone.getName().equals("handle_helmet")) {
 					bone.setRotationX(-e.getRenderer().getMainModel().bipedHead.rotateAngleX);
 					bone.setRotationY(-e.getRenderer().getMainModel().bipedHead.rotateAngleY);
 					bone.setRotationZ(-e.getRenderer().getMainModel().bipedHead.rotateAngleZ);
 				}
-				break;
 			}
-			stack.pop();
+
+			if (MainGPModels.renderItemInHand) {
+				renderItemInHand(animatable, builder, bone, e, "rightArmUp", "leftArmDown");
+			}
+			break;
 		}
+		stack.pop();
 
 		stack.push();
 
@@ -192,15 +201,14 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 
 		if (!bone.isHidden) {
 			for (GeoCube cube : bone.childCubes) {
-				stack.push();
-				GlStateManager.pushMatrix();
+				Minecraft.getMinecraft().getTextureManager()
+						.bindTexture(getGeoModelProvider().getTextureLocation(animatable));
 				renderCube(builder, stack, cube);
-				GlStateManager.popMatrix();
-				stack.pop();
+
 			}
 
 			for (GeoBone childBone : bone.childBones) {
-				renderRecursively(builder, stack, childBone, e, modelCap);
+				renderRecursively(animatable, builder, stack, childBone, e, modelCap);
 			}
 		}
 
@@ -220,6 +228,9 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 	}
 
 	private void renderCube(BufferBuilder builder, MatrixStack stack, GeoCube cube) {
+
+		GlStateManager.pushMatrix();
+		builder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
 
 		stack.push();
 		stack.moveToPivot(cube);
@@ -250,6 +261,46 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 			}
 
 		}
+
+		Tessellator.getInstance().draw();
 		stack.pop();
+		GlStateManager.popMatrix();
+	}
+
+	public void renderItemInHand(T animatable, BufferBuilder builder, GeoBone itemBone, RenderPlayerEvent e,
+			String mainItemBoneName, String secondaryItemBoneName) {
+
+		ItemStack mainItem = e.getEntityPlayer().getHeldItemMainhand();
+		ItemStack secondaryItem = e.getEntityPlayer().getHeldItemOffhand();
+
+		// Right arm
+		if (mainItem != null) {
+			if (itemBone.getName().equals(mainItemBoneName)) {
+				GlStateManager.pushMatrix();
+				MatrixUtils.multiplyMatrix(MATRIX_STACK, itemBone);
+				if (mainItem.getItem() instanceof ItemBlock) {
+					GlStateManager.scale(0.3, 0.3, 0.3);
+					GlStateManager.translate(0.1, -1, -1);
+				}
+				Minecraft.getMinecraft().getItemRenderer().renderItem(e.getEntityPlayer(), mainItem,
+						TransformType.NONE);
+				GlStateManager.popMatrix();
+			}
+		}
+
+		// Left arm
+		if (secondaryItem != null) {
+			if (itemBone.getName().equals(secondaryItemBoneName)) {
+				GlStateManager.pushMatrix();
+				MatrixUtils.multiplyMatrix(MATRIX_STACK, itemBone);
+				if (secondaryItem.getItem() instanceof ItemBlock) {
+					GlStateManager.scale(0.3, 0.3, 0.3);
+					GlStateManager.translate(0.1, -1, -1);
+				}
+				Minecraft.getMinecraft().getItemRenderer().renderItem(e.getEntityPlayer(), secondaryItem,
+						TransformType.NONE);
+				GlStateManager.popMatrix();
+			}
+		}
 	}
 }

@@ -35,7 +35,6 @@ public class CommonEventHandler {
 
 	@SubscribeEvent
 	public static void onBlockRegister(RegistryEvent.Register<Block> e) {
-		if (MainGPModels.blockWay)
 			e.getRegistry().registerAll(BlockInit.BLOCKS.toArray(new Block[0]));
 	}
 
