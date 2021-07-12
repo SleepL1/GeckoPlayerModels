@@ -1,0 +1,17 @@
+[
+{
+  "modid": "gpm",
+  "name": "GeckoPlayerModels",
+  "description": "Example for animated and custom player models. Powered by GeckoLib.",
+  "version": "0.0.1",
+  "mcversion": "1.12.2",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["SleepX10"],
+  "credits": "To Gecko, Azure and McHorse to provide this powerful library. And to me for design this example!",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": [geckolib3],
+  "requiredMods": [geckolib3]
+}
+]

@@ -1,0 +1,39 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+version = '0.0.1'
+group = 'sleepx10.MainGeckoPlayerModels' 
+archivesBaseName = 'gpm'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' 
+
+minecraft {
+    version = '1.12.2-14.23.5.2847'
+    runDir = 'run'
+
+    mappings = 'stable_39'
+	makeObfSourceJar = false
+}
+
+repositories{
+    maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+}
+
+dependencies {
+	deobfCompile('software.bernie.geckolib:forge-1.12.2-geckolib:3.0.0-beta.7')
+}
+
+
+jar.finalizedBy('reobfJar') 
