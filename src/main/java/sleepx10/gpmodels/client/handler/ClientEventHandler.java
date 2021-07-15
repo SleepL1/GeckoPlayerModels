@@ -1,9 +1,9 @@
 package sleepx10.gpmodels.client.handler;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -23,13 +23,13 @@ import sleepx10.gpmodels.common.items.ItemInit;
 public class ClientEventHandler {
 
 	// List of players that are under GeckoPlayer
-	public static HashMap<EntityPlayer, GeckoPlayer> geckoPlayers = new HashMap<>();
+	public static HashMap<UUID, GeckoPlayer> geckoPlayers = new HashMap<>();
 
 	// List of the players models
-	public static HashMap<EntityPlayer, ModelGeckoPlayer> geckoPlayerModels = new HashMap<>();
+	public static HashMap<UUID, ModelGeckoPlayer> geckoPlayerModels = new HashMap<>();
 
 	// List of the players renderer
-	public static HashMap<EntityPlayer, GeckoPlayerRenderer<GeckoPlayer>> geckoPlayerRenderers = new HashMap<>();
+	public static HashMap<UUID, GeckoPlayerRenderer<GeckoPlayer>> geckoPlayerRenderers = new HashMap<>();
 
 	@SubscribeEvent
 	public static void onModelRegister(ModelRegistryEvent e) {
@@ -54,22 +54,22 @@ public class ClientEventHandler {
 				 * This look a little bit messy, if you know another way of how to do this feel
 				 * free to open a PR!
 				 **/
-				if (!geckoPlayers.containsKey(e.getEntityPlayer())) {
-					geckoPlayers.put(e.getEntityPlayer(), new GeckoPlayer(e.getEntityPlayer()));
+				if (!geckoPlayers.containsKey(e.getEntityPlayer().getPersistentID())) {
+					geckoPlayers.put(e.getEntityPlayer().getPersistentID(), new GeckoPlayer(e.getEntityPlayer().getPersistentID()));
 				}
 
-				if (!geckoPlayerModels.containsKey(e.getEntityPlayer())) {
-					geckoPlayerModels.put(e.getEntityPlayer(), new ModelGeckoPlayer());
+				if (!geckoPlayerModels.containsKey(e.getEntityPlayer().getPersistentID())) {
+					geckoPlayerModels.put(e.getEntityPlayer().getPersistentID(), new ModelGeckoPlayer());
 				}
 
-				if (!geckoPlayerRenderers.containsKey(e.getEntityPlayer())) {
-					geckoPlayerRenderers.put(e.getEntityPlayer(),
-							new GeckoPlayerRenderer<>(geckoPlayerModels.get(e.getEntityPlayer())));
+				if (!geckoPlayerRenderers.containsKey(e.getEntityPlayer().getPersistentID())) {
+					geckoPlayerRenderers.put(e.getEntityPlayer().getPersistentID(),
+							new GeckoPlayerRenderer<>(geckoPlayerModels.get(e.getEntityPlayer().getPersistentID())));
 				}
 
-				GeckoPlayerRenderer<GeckoPlayer> geckoPlayerRenderer = geckoPlayerRenderers.get(e.getEntityPlayer());
-				GeckoPlayer geckoPlayer = geckoPlayers.get(e.getEntityPlayer());
-				ModelGeckoPlayer geckoPlayerModel = geckoPlayerModels.get(e.getEntityPlayer());
+				GeckoPlayerRenderer<GeckoPlayer> geckoPlayerRenderer = geckoPlayerRenderers.get(e.getEntityPlayer().getPersistentID());
+				GeckoPlayer geckoPlayer = geckoPlayers.get(e.getEntityPlayer().getPersistentID());
+				ModelGeckoPlayer geckoPlayerModel = geckoPlayerModels.get(e.getEntityPlayer().getPersistentID());
 
 				if (!geckoPlayerRenderer.getModelsToLoad().containsKey(geckoPlayer.getClass())) {
 					geckoPlayerRenderer.getModelsToLoad().put(geckoPlayer.getClass(), geckoPlayerRenderer);

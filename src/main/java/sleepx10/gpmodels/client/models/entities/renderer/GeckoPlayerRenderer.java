@@ -99,7 +99,7 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 	public void renderPlayer(GeoModel model, T animatable, float partialTicks, float red, float green, float blue,
 			float alpha, RenderPlayerEvent e, IModelsCap modelCap) {
 
-		if (animatable.getPlayer().isInvisibleToPlayer(Minecraft.getMinecraft().player))
+		if (e.getEntityPlayer().isInvisibleToPlayer(Minecraft.getMinecraft().player))
 			return;
 
 		GlStateManager.pushMatrix();
@@ -127,7 +127,7 @@ public class GeckoPlayerRenderer<T extends GeckoPlayer & IAnimatable> implements
 
 		renderPlayerEarly(animatable, partialTicks, red, green, blue, alpha, e);
 
-		getGeoModelProvider().setLivingAnimations(animatable, animatable.getPlayer().getUniqueID().hashCode());
+		getGeoModelProvider().setLivingAnimations(animatable, e.getEntityPlayer().getPersistentID().hashCode());
 		setColor(1F, 1F, 1F, 1F);
 
 		GlStateManager.disableCull();

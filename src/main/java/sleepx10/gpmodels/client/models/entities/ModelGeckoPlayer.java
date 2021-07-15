@@ -43,9 +43,9 @@ public class ModelGeckoPlayer extends AnimatedGeoModel<GeckoPlayer> {
 			return true;
 		default:
 			System.out.println("Could not find any ResourceLocation for the modelId: "+modelId);
-			ClientEventHandler.geckoPlayers.remove(player);
-			ClientEventHandler.geckoPlayerModels.remove(player);
-			ClientEventHandler.geckoPlayerRenderers.remove(player);
+			ClientEventHandler.geckoPlayers.remove(player.getPersistentID());
+			ClientEventHandler.geckoPlayerModels.remove(player.getPersistentID());
+			ClientEventHandler.geckoPlayerRenderers.remove(player.getPersistentID());
 			return false;
 		}
 	}
