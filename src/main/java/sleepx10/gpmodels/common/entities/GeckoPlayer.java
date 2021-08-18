@@ -2,12 +2,10 @@ package sleepx10.gpmodels.common.entities;
 
 import java.util.UUID;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import sleepx10.gpmodels.common.capabilities.IModelsCap;
-import sleepx10.gpmodels.common.capabilities.core.ModCapabilities;
+import software.bernie.geckolib3.core.AnimationState;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.builder.Animation;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
@@ -18,6 +16,7 @@ public class GeckoPlayer implements IAnimatable {
 
 	private UUID uuid;
 	private AnimationFactory factory = new AnimationFactory(this);
+	private AnimationController<GeckoPlayer> animationController;
 
 	public GeckoPlayer(UUID uuid) {
 		this.uuid = uuid;
@@ -25,7 +24,9 @@ public class GeckoPlayer implements IAnimatable {
 
 	@Override
 	public void registerControllers(AnimationData data) {
-		data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+		AnimationController<GeckoPlayer> animationController = new AnimationController<>(this, "controller", 0, this::predicate);
+		this.animationController = animationController;
+		
 	}
 
 	@Override
@@ -34,22 +35,19 @@ public class GeckoPlayer implements IAnimatable {
 	}
 
 	public <E extends IAnimatable> PlayState predicate(AnimationEvent<E> e) {
-		EntityPlayer player = Minecraft.getMinecraft().world.getPlayerEntityByUUID(uuid);
-		if (player != null) {
-			IModelsCap modelCap = player.getCapability(ModCapabilities.CAPABILITY_MODELS, null);
-			if (modelCap != null) {
-				switch (modelCap.getModelId()) {
-				case "impModel":
-					e.getController().setAnimation(new AnimationBuilder().addAnimation("attacking"));
-					break;
-				case "humanModel":
-					e.getController().setAnimation(new AnimationBuilder().addAnimation("HUMAN_WALKING2"));
-					break;
-				default:
-					System.out.println("Could not find any animation for the modelId:" + modelCap.getModelId());
-				}
-			}
-		}
+		e.getController().setAnimation(new AnimationBuilder().addAnimation("ARCOSIAN_NOTHING", false));
+        if (e.getController().getAnimationState() == AnimationState.Transitioning) {
+            return PlayState.CONTINUE;
+        }
+        
+        final Animation current = e.getController().getCurrentAnimation();
+        if (current != null && !current.loop && e.getController().getAnimationState() != AnimationState.Stopped) {
+            return PlayState.CONTINUE;
+        }
 		return PlayState.CONTINUE;
+	}
+
+	public AnimationController<GeckoPlayer> getAnimationController() {
+		return animationController;
 	}
 }

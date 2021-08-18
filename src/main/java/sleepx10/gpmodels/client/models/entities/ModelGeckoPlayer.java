@@ -41,6 +41,11 @@ public class ModelGeckoPlayer extends AnimatedGeoModel<GeckoPlayer> {
 			this.modelLocation = new ResourceLocation(Reference.MOD_ID, "geo/models/player.humanmodel.geo.json");
 			this.textureLocation = new ResourceLocation(Reference.MOD_ID, "textures/entities/player/player.human.texture.png");
 			return true;
+		case "arcosianModel":
+			this.animationFileLocation = new ResourceLocation(Reference.MOD_ID, "animations/player.arcosian.animation.json");
+			this.modelLocation = new ResourceLocation(Reference.MOD_ID, "geo/models/player.arcosian.geo.json");
+			this.textureLocation = new ResourceLocation(Reference.MOD_ID, "textures/entities/player/player.arcosian.texture.png");
+			return true;
 		default:
 			System.out.println("Could not find any ResourceLocation for the modelId: "+modelId);
 			ClientEventHandler.geckoPlayers.remove(player.getPersistentID());

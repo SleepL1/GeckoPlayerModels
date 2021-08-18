@@ -1,18 +1,16 @@
 package sleepx10.gpmodels.common.handler;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -23,6 +21,7 @@ import sleepx10.gpmodels.common.blocks.BlockInit;
 import sleepx10.gpmodels.common.capabilities.IModelsCap;
 import sleepx10.gpmodels.common.capabilities.core.ModCapabilities;
 import sleepx10.gpmodels.common.items.ItemInit;
+import sleepx10.gpmodels.common.network.PacketPlaceBlock;
 
 @EventBusSubscriber
 public class CommonEventHandler {
@@ -63,6 +62,12 @@ public class CommonEventHandler {
 			}
 		}
 	}
+	
+	@SuppressWarnings("deprecation")
+	@SubscribeEvent
+	public static void onBlockPlaced(BlockEvent.PlaceEvent e) {
+		MainGPModels.NETWORK.sendToAll(new PacketPlaceBlock(e.getPlayer().getUniqueID().toString()));
+	}
 
 	@SubscribeEvent
 	public static void onItemRightClick(RightClickItem e) {
@@ -76,20 +81,9 @@ public class CommonEventHandler {
 							IModelsCap modelCap = e.getEntityPlayer().getCapability(ModCapabilities.CAPABILITY_MODELS,
 									null);
 							if (modelCap != null) {
-								Random r = new Random();
-								int i = r.nextInt(2);
-								System.out.println(i);
-								switch (i) {
-								case 0:
-									modelCap.setModelId("impModel");
-									break;
-								case 1:
-									modelCap.setModelId("humanModel");
-									break;
-								}
+								modelCap.setModelId("arcosianModel");
 								modelCap.serializeNBT();
 								modelCap.sendDataToAllTracking((EntityPlayerMP) e.getEntityPlayer());
-								e.getEntityPlayer().sendMessage(new TextComponentString(modelCap.getModelId()));
 							}
 						}
 					}

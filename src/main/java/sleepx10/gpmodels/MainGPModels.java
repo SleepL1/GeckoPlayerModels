@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import sleepx10.gpmodels.common.capabilities.network.ModelsCapMeesage;
+import sleepx10.gpmodels.common.network.PacketPlaceBlock;
 import sleepx10.gpmodels.proxies.CommonProxy;
 import sleepx10.gpmodels.utils.Reference;
 
@@ -46,6 +47,7 @@ public class MainGPModels {
 		
 		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.MOD_ID);
 		NETWORK.registerMessage(ModelsCapMeesage.Handler.class, ModelsCapMeesage.class, 0, Side.CLIENT);
+		NETWORK.registerMessage(PacketPlaceBlock.Handler.class, PacketPlaceBlock.class, 1, Side.CLIENT);
 	}
 	
 	@EventHandler
